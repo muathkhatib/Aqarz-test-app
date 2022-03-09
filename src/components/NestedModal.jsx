@@ -170,7 +170,17 @@ const NestedModal = ({
                                 {row.cancel_cause || "------"}
                               </TableCell>
                               <TableCell align="center">
-                                {row.attachments || "No Attachments"}
+                                {row.attachments ? (
+                                  <a
+                                    href={row.attachments}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    عرض صورة
+                                  </a>
+                                ) : (
+                                  "لا يوجد صورة"
+                                )}
                               </TableCell>
                               <TableCell align="center">
                                 {row.contract_status}
