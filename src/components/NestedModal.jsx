@@ -80,7 +80,6 @@ const NestedModal = ({
   tableDataType,
   childTableData,
 }) => {
-  console.log({ tableDataType, childTableData });
   return tableDataType ? (
     <>
       <div>
@@ -156,10 +155,15 @@ const NestedModal = ({
                           {tableDataType === "contact_stages" && (
                             <>
                               <TableCell align="center">
-                                {row.contact_status}
+                                {row.contact_status === "recall"
+                                  ? "لم يتم الرد"
+                                  : row.contact_status}
                               </TableCell>
                               <TableCell align="center">
-                                {row.implementation_cases}
+                                {row.implementation_cases ===
+                                "looking_for_financing"
+                                  ? "يبحث عن عقار"
+                                  : "غير جاد"}
                               </TableCell>
                               <TableCell align="center">{row.notes}</TableCell>
                             </>
