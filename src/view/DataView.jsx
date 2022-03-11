@@ -28,7 +28,7 @@ const DataView = () => {
     try {
       const { data } = await axios({
         method: "get",
-        url: "/api/dashboard/fund/clickup/preview/requests",
+        url: `${process.env.REACT_APP_API_URL}/api/dashboard/fund/clickup/preview/requests`,
         headers: {
           "Content-Type": "application/json",
           auth: `token ${process.env.REACT_APP_API_TOKEN}`,
