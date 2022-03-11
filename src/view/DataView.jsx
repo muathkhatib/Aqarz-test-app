@@ -24,6 +24,17 @@ const DataView = () => {
   const [tableBodyData, setTableBodyData] = React.useState(null);
   const [tableNestedBodyData, setTableNestedBodyData] = React.useState(null);
 
+  const statusConverter = (status) => {
+    switch (status) {
+      case "1" || 1:
+        return "نعم";
+      case "0" || 0:
+        return "لا";
+      default:
+        return "";
+    }
+  };
+
   const getData = async () => {
     try {
       const { data } = await axios({
@@ -36,7 +47,7 @@ const DataView = () => {
           type: process.env.REACT_APP_API_TYPE,
         },
       });
-
+      console.log(data.result);
       return setTableBodyData(data.result);
     } catch (err) {
       console.error(err);
@@ -172,7 +183,18 @@ const DataView = () => {
                       </TableCell>
                       <TableCell align="center">{row.emp.name}</TableCell>
                       <TableCell align="center">{row.notes}</TableCell>
-                      <TableCell align="center">fff</TableCell>
+                      <TableCell align="center">
+                        <Button
+                          onClick={() => {
+                            setTableHeaderName("emoplyee");
+
+                            console.log(row.field_preview_stages);
+                            setTableNestedBodyData(row.field_preview_stages);
+                          }}
+                        >
+                          الميداني
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -230,6 +252,34 @@ const DataView = () => {
                       <TableCell align="center">{row.funding_status}</TableCell>
                       <TableCell align="center">{row.notes}</TableCell>
                     </TableRow>
+                  );
+                })}
+              {tableHeaderName === "emoplyee" &&
+                tableNestedBodyData.map((row) => {
+                  return (
+                    <>
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={row.code}
+                      >
+                        <TableCell align="center">
+                          {console.log(row)}
+                          {row.field_emp_name}
+                        </TableCell>
+                        <TableCell align="center">
+                          {statusConverter(row.attendance_status)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {statusConverter(row.preview_status)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {row.estate_visited_count || 0}
+                        </TableCell>
+                        <TableCell align="center">{row.notes}</TableCell>
+                      </TableRow>
+                    </>
                   );
                 })}
             </TableBody>
