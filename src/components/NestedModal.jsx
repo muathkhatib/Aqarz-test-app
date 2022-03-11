@@ -6,6 +6,7 @@ import {
   InputLabel,
   Input,
   FormHelperText,
+  Button,
 } from "@mui/material";
 
 const style = {
@@ -16,7 +17,24 @@ const style = {
   pb: 3,
 };
 
-const NestedModal = ({ openNestedModal, setOpenNestedModal }) => {
+const NestedModal = ({
+  openNestedModal,
+  setOpenNestedModal,
+  tableHeaderName,
+  setTableNestedBodyData,
+  setTableBodyData,
+}) => {
+  const [requestId, setRequestId] = React.useState("");
+  const [previewDate, setPreviewDate] = React.useState("");
+  const [previewTime, setPreviewTime] = React.useState("");
+  const [ascertainmentStatus, setAscertainmentStatus] = React.useState("");
+  const [notes, setNotes] = React.useState("");
+  const [assignedId, setAssignedId] = React.useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <>
       <div>
@@ -32,13 +50,22 @@ const NestedModal = ({ openNestedModal, setOpenNestedModal }) => {
           }}
         >
           <Box sx={{ ...style, width: 400, height: "90%" }}>
-            <FormControl>
-              <InputLabel htmlFor="my-input">Email address</InputLabel>
-              <Input id="my-input" aria-describedby="my-helper-text" />
-              <FormHelperText id="my-helper-text">
-                We'll never share your email.
-              </FormHelperText>
-            </FormControl>
+            <form onSubmit={handleSubmit}>
+              {tableHeaderName === "preview_stages" && (
+                <>
+                  <FormControl>
+                    <InputLabel htmlFor="request_id">رقم المعاينة</InputLabel>
+                    <Input id="request_id" aria-describedby="my-helper-text" />
+                    {/* <FormHelperText id="my-helper-text">
+                      We'll never share your email.
+                    </FormHelperText> */}
+                  </FormControl>
+                </>
+              )}
+              <Button variant="contained" color="primary" type="submit">
+                jsj
+              </Button>
+            </form>
           </Box>
         </Modal>
       </div>

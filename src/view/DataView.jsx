@@ -47,7 +47,6 @@ const DataView = () => {
           type: process.env.REACT_APP_API_TYPE,
         },
       });
-      console.log(data.result);
       return setTableBodyData(data.result);
     } catch (err) {
       console.error(err);
@@ -65,20 +64,20 @@ const DataView = () => {
         setTableNestedBodyData={setTableNestedBodyData}
         setTableBodyData={setTableBodyData}
       />
-      <section
-        style={{
-          height: "10vh",
-          border: "1px solid #e0e0e0",
-          borderRadius: "5px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 2rem",
-          marginButtom: "2rem",
-          boxShadow: " 0px 20px 10px 1px #c7c7c7",
-        }}
-      >
-        {tableHeaderName !== "main" && (
+      {tableHeaderName !== "main" && (
+        <section
+          style={{
+            height: "10vh",
+            border: "1px solid #e0e0e0",
+            borderRadius: "5px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 2rem",
+            marginButtom: "2rem",
+            boxShadow: " 0px 20px 10px 1px #c7c7c7",
+          }}
+        >
           <Button
             variant="contained"
             onClick={() =>
@@ -87,11 +86,11 @@ const DataView = () => {
           >
             الرجوع للخلف
           </Button>
-        )}
-        <Button variant="contained" onClick={() => setOpenNestedModal(true)}>
-          إضافة عنصر جديد
-        </Button>
-      </section>
+          <Button variant="contained" onClick={() => setOpenNestedModal(true)}>
+            إضافة عنصر جديد
+          </Button>
+        </section>
+      )}
       <section style={styles.container}>
         <TableContainer sx={{ height: "90vh" }}>
           <Table stickyHeader aria-label="sticky table">
@@ -265,7 +264,6 @@ const DataView = () => {
                         key={row.code}
                       >
                         <TableCell align="center">
-                          {console.log(row)}
                           {row.field_emp_name}
                         </TableCell>
                         <TableCell align="center">
