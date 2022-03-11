@@ -67,14 +67,16 @@ const DataView = () => {
           boxShadow: " 0px 20px 10px 1px #c7c7c7",
         }}
       >
-        <Button
-          variant="contained"
-          onClick={() =>
-            tableHeaderName !== "main" ? setTableHeaderName("main") : null
-          }
-        >
-          الرجوع للخلف
-        </Button>
+        {tableHeaderName !== "main" && (
+          <Button
+            variant="contained"
+            onClick={() =>
+              tableHeaderName !== "main" ? setTableHeaderName("main") : null
+            }
+          >
+            الرجوع للخلف
+          </Button>
+        )}
         <Button variant="contained" onClick={() => setOpenNestedModal(true)}>
           إضافة عنصر جديد
         </Button>
