@@ -1,156 +1,252 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
-  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   Button,
+  CircularProgress,
 } from "@mui/material";
 
-import data from "../constants/data";
 import styles from "./styles";
 import NestedModal from "../components/NestedModal";
+import axios from "axios";
+import tableHeader from "../constants/tableHeaders";
 
-
-const columns = [
-  { id: "id", label: "رقم الطلب", minWidth: 20, align: "center" },
-  { id: "name", label: "اسم المستفيد", minWidth: 120, align: "center" },
-  { id: "code", label: "رقم المستفيد", minWidth: 100, align: "center" },
-  { id: "population", label: "اسم المدينة", minWidth: 70, align: "center" },
-  { id: "size", label: "اسم الحي", minWidth: 100, align: "center" },
-  { id: "density", label: "السعر المطلوب", minWidth: 120, align: "center" },
-  { id: "density", label: "نوع العقار", minWidth: 50, align: "center" },
-  { id: "density", label: "اسم حالة الطلب", minWidth: 70, align: "center" },
-  { id: "density", label: "حالة الطلب", minWidth: 170, align: "center" },
-  { id: "density", label: "العمليات", minWidth: 150, align: "center" },
-];
 const DataView = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openNestedModal, setOpenNestedModal] = React.useState(false);
-  const [tableDataType, setTableDataType] = React.useState("");
-  const [childTableData, setChildTableData] = React.useState([]);
-  // tableDataType,childTableData
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const [tableHeaders] = React.useState(tableHeader);
+
+  const [tableHeaderName, setTableHeaderName] = React.useState("main");
+  const [tableBodyData, setTableBodyData] = React.useState(null);
+  const [tableNestedBodyData, setTableNestedBodyData] = React.useState(null);
+
+  const getData = async () => {
+    try {
+      const { data } = await axios({
+        method: "get",
+        url: "/api/dashboard/fund/clickup/preview/requests",
+        headers: {
+          "Content-Type": "application/json",
+          auth: `token ${process.env.REACT_APP_API_TOKEN}`,
+          role: process.env.REACT_APP_API_ROLE,
+          type: process.env.REACT_APP_API_TYPE,
+        },
+      });
+
+      return setTableBodyData(data.result);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-  return (
+  useEffect(() => getData(), []);
+
+  return tableBodyData ? (
     <>
       <NestedModal
         openNestedModal={openNestedModal}
         setOpenNestedModal={setOpenNestedModal}
-        tableDataType={tableDataType}
-        childTableData={childTableData}
+        tableHeaderName={tableHeaderName}
+        setTableNestedBodyData={setTableNestedBodyData}
+        setTableBodyData={setTableBodyData}
       />
+      <section
+        style={{
+          height: "10vh",
+          border: "1px solid #e0e0e0",
+          borderRadius: "5px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 2rem",
+          marginButtom: "2rem",
+          boxShadow: " 0px 20px 10px 1px #c7c7c7",
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() =>
+            tableHeaderName !== "main" ? setTableHeaderName("main") : null
+          }
+        >
+          الرجوع للخلف
+        </Button>
+        <Button variant="contained" onClick={() => setOpenNestedModal(true)}>
+          إضافة عنصر جديد
+        </Button>
+      </section>
       <section style={styles.container}>
-        <Paper sx={styles.tableBody}>
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ width: column.minWidth }}
+        <TableContainer sx={{ height: "90vh" }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {tableHeaders[tableHeaderName].map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ width: column.minWidth }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tableHeaderName === "main" &&
+                !!tableBodyData &&
+                tableBodyData.map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
                     >
-                      {column.label}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.result
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={row.code}
-                      >
-                        <TableCell align="center">{row.id}</TableCell>
-                        <TableCell align="center">
-                          {row.beneficiary_name || "لا يوجد اسم"}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.beneficiary_mobile || "لا يوجد رقم"}
-                        </TableCell>
-                        <TableCell align="center">{row.city_name}</TableCell>
-                        <TableCell align="center">
-                          {row.neighborhood_name}
-                        </TableCell>
-                        <TableCell align="center">{row.EstatePrice}</TableCell>
-                        <TableCell align="center">
-                          {row.estate_type_name}
-                        </TableCell>
-                        <TableCell align="center">{row.status_name}</TableCell>
-                        <TableCell align="center">{row.status}</TableCell>
-                        <TableCell align="center">
-                          <Button
-                            onClick={() => {
-                              setTableDataType("preview_stages");
-                              setChildTableData(row.preview_stages);
-                              setTimeout(() => {
-                                setOpenNestedModal(true);
-                              }, 100);
-                            }}
-                          >
-                            الزيارات
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setTableDataType("contact_stages");
-                              setChildTableData(row.contact_stages);
-                              setTimeout(() => {
-                                setOpenNestedModal(true);
-                              }, 100);
-                            }}
-                          >
-                            التواصل
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setTableDataType("finance_stages");
-                              setChildTableData(row.finance_stages);
-                              setTimeout(() => {
-                                setOpenNestedModal(true);
-                              }, 100);
-                            }}
-                          >
-                            التمويل
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                      <TableCell align="center">{row.id}</TableCell>
+                      <TableCell align="center">
+                        {row.beneficiary_name || "لا يوجد اسم"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.beneficiary_mobile || "لا يوجد رقم"}
+                      </TableCell>
+                      <TableCell align="center">{row.city_name}</TableCell>
+                      <TableCell align="center">
+                        {row.neighborhood_name}
+                      </TableCell>
+                      <TableCell align="center">{row.EstatePrice}</TableCell>
+                      <TableCell align="center">
+                        {row.estate_type_name}
+                      </TableCell>
+                      <TableCell align="center">{row.status_name}</TableCell>
+                      <TableCell align="center">{row.status}</TableCell>
+                      <TableCell align="center">
+                        <Button
+                          onClick={() => {
+                            setTableHeaderName("preview_stages");
+                            setTableNestedBodyData(row.preview_stages);
+                          }}
+                        >
+                          الزيارات
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setTableHeaderName("contact_stages");
+                            setTableNestedBodyData(row.contact_stages);
+                          }}
+                        >
+                          التواصل
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setTableHeaderName("finance_stages");
+                            setTableNestedBodyData(row.finance_stages);
+                          }}
+                        >
+                          التمويل
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
 
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={data.result.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>{" "}
+              {tableHeaderName === "preview_stages" &&
+                tableNestedBodyData.map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
+                    >
+                      <TableCell align="center">{row.request_id}</TableCell>
+                      <TableCell align="center">{row.preview_date}</TableCell>
+                      <TableCell align="center">{row.preview_time}</TableCell>
+                      <TableCell align="center">
+                        {row.ascertainment_status}
+                      </TableCell>
+                      <TableCell align="center">{row.emp.name}</TableCell>
+                      <TableCell align="center">{row.notes}</TableCell>
+                      <TableCell align="center">fff</TableCell>
+                    </TableRow>
+                  );
+                })}
+              {tableHeaderName === "contact_stages" &&
+                tableNestedBodyData.map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
+                    >
+                      <TableCell align="center">
+                        {row.contact_status === "recall"
+                          ? "لم يتم الرد"
+                          : row.contact_status}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.implementation_cases === "looking_for_financing"
+                          ? "يبحث عن عقار"
+                          : "غير جاد"}
+                      </TableCell>
+                      <TableCell align="center">{row.notes}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              {tableHeaderName === "finance_stages" &&
+                tableNestedBodyData.map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.code}
+                    >
+                      <TableCell align="center">
+                        {row.cancel_cause || "------"}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.attachments ? (
+                          <a
+                            href={row.attachments}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            عرض صورة
+                          </a>
+                        ) : (
+                          "لا يوجد صورة"
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.contract_status}
+                      </TableCell>
+                      <TableCell align="center">{row.funding_status}</TableCell>
+                      <TableCell align="center">{row.notes}</TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </section>
     </>
+  ) : (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress />
+    </div>
   );
 };
 

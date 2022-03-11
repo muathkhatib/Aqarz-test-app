@@ -8,7 +8,8 @@ const styles = {
   },
   tableBody: {
     width: "100%",
-    height: "100vh",
+    height: "90vh",
+    border: "1px solid red",
     overflow: "hidden",
   },
   modalBoxStyle: {
